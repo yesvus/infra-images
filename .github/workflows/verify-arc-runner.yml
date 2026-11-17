@@ -1,0 +1,33 @@
+name: Verify ARC runner ARM64
+
+on:
+  pull_request:
+    paths:
+      - 'images/arc-runner/**'
+      - 'scripts/build-smoke.sh'
+      - '.github/workflows/verify-arc-runner.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'images/arc-runner/**'
+      - 'scripts/build-smoke.sh'
+      - '.github/workflows/verify-arc-runner.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-arc-runner-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069
+      - name: Native build and isolated smoke
+        run: bash scripts/build-smoke.sh arc-runner

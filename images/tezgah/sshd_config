@@ -1,0 +1,27 @@
+# Non-root OpenSSH server. Never expose this service beyond ClusterIP.
+# Host key and authorized_keys belong to the user-owned persistent PVC.
+Port 2222
+AddressFamily inet
+ListenAddress 0.0.0.0
+HostKey /workspace/.home/.ssh/ssh_host_ed25519_key
+PidFile /tmp/tezgah-sshd.pid
+AuthorizedKeysFile /workspace/.home/.ssh/authorized_keys
+StrictModes yes
+AllowUsers dev
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitEmptyPasswords no
+UsePAM no
+PermitRootLogin no
+AuthenticationMethods publickey
+AllowAgentForwarding no
+AllowTcpForwarding local
+AllowStreamLocalForwarding no
+GatewayPorts no
+PermitTunnel no
+X11Forwarding no
+PermitUserEnvironment no
+PermitTTY yes
+Subsystem sftp internal-sftp
+LogLevel VERBOSE

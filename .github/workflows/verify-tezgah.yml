@@ -1,0 +1,34 @@
+name: Verify Tezgah ARM64
+
+on:
+  pull_request:
+    paths:
+      - 'images/tezgah/**'
+      - 'scripts/build-smoke.sh'
+      - 'images/tezgah/smoke.sh'
+      - '.github/workflows/verify-tezgah.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'images/tezgah/**'
+      - 'scripts/build-smoke.sh'
+      - '.github/workflows/verify-tezgah.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-tezgah-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069
+      - name: Native build and isolated smoke
+        run: bash scripts/build-smoke.sh tezgah

@@ -6,6 +6,8 @@ RUN npm install --global --no-audit --no-fund "@opencode/cli@${OPENCODE_VERSION}
  && test "$(opencode --version)" = "opencode v${OPENCODE_VERSION}"
 
 FROM ghcr.io/actions/actions-runner@sha256:e5496277be5d09bc968b3d64911b74e219ac4a3f2edce956a3ecf9271bea1ef4
+LABEL org.opencontainers.image.source="https://github.com/yesvus/infra-images" \
+      org.opencontainers.image.description="Ephemeral AMD64 GitHub Actions runner with OpenCode"
 USER root
 COPY --from=opencode-builder /usr/local/lib/node_modules/@opencode/cli /opt/opencode/cli
 RUN ln -s /opt/opencode/cli/bin/opencode.exe /usr/local/bin/opencode \

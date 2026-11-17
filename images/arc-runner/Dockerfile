@@ -2,6 +2,9 @@
 # publish/migration/release jobs. Target: ARM64 ARC runner Pods in Kubernetes.
 FROM ghcr.io/actions/actions-runner@sha256:e5496277be5d09bc968b3d64911b74e219ac4a3f2edce956a3ecf9271bea1ef4
 
+LABEL org.opencontainers.image.source="https://github.com/yesvus/infra-images" \
+      org.opencontainers.image.description="Ephemeral ARM64 GitHub Actions Runner with kubectl"
+
 USER root
 ARG TARGETARCH=arm64
 ARG KUBECTL_VERSION=v1.36.4

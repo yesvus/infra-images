@@ -37,7 +37,11 @@ case "$image" in
     ;;
   arc-opencode)
     docker run --rm --network none --platform linux/amd64 --read-only \
-      --cap-drop ALL --security-opt no-new-privileges --entrypoint /bin/bash \
+      --cap-drop ALL --security-opt no-new-privileges \
+      --tmpfs /tmp:rw,nosuid,nodev,size=134217728,uid=1001,gid=1001,mode=0700 \
+      --env HOME=/tmp --env XDG_DATA_HOME=/tmp/.local/share \
+      --env XDG_CACHE_HOME=/tmp/.cache --env XDG_CONFIG_HOME=/tmp/.config \
+      --entrypoint /bin/bash \
       "$tag" -ec 'test "$(id -u)" = 1001; test "$(uname -m)" = x86_64; test "$(opencode --version)" = "opencode v2.3.0"; test -x /home/runner/run.sh'
     ;;
 esac

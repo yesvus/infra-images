@@ -27,11 +27,25 @@ RUN apt-get update \
  && rm -f /etc/ssh/ssh_host_* \
  && mkdir -p /run/sshd \
  && chmod 0755 /run/sshd \
- && rm -rf /var/lib/apt/lists/* \
- && npm install --global --no-audit --no-fund \
-      "@opencode/cli@$OPENCODE_VERSION" "@openai/codex@$CODEX_VERSION" \
-      "@anthropic-ai/claude-code@$CLAUDE_CODE_VERSION" \
- && npm cache clean --force
+ && rm -rf /var/lib/apt/lists/*
+
+# OpenCode's platform binary is downloaded during npm postinstall.
+# The upstream download can fail transiently; retry the exact pinned versions
+# without repeating apt or silently changing to an unpinned release.
+RUN set -eu; \
+    attempt=1; \
+    while [ "$attempt" -le 2 ]; do \
+      if npm install --global --no-audit --no-fund \
+          "@opencode/cli@$OPENCODE_VERSION" "@openai/codex@$CODEX_VERSION" \
+          "@anthropic-ai/claude-code@$CLAUDE_CODE_VERSION"; then \
+        npm cache clean --force; \
+        exit 0; \
+      fi; \
+      echo "Pinned npm tool installation failed (attempt $attempt/2)" >&2; \
+      attempt=$((attempt + 1)); \
+      sleep 5; \
+    done; \
+    exit 1
 
 # Version-pinned upstream ARM64 releases with independently retrieved GitHub
 # release-asset SHA-256. Both are tools only; never bake credentials into image.
